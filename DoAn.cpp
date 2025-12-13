@@ -6,10 +6,16 @@
 #include <iomanip>
 #include <cstdlib>
 #include <cctype>
-
+#include<algorithm>
 using namespace std;
 #define MAX_CARS 100
-
+void xoaManHinh() {
+    #ifdef _WIN32
+        system("cls");  
+    #else
+        system("clear");
+    #endif
+}
 struct Car {
     int id;
     char brand[50];
@@ -21,20 +27,6 @@ struct Car {
 };
 
 
-
-void xoaManHinh() {
-    #ifdef _WIN32
-        system("cls");  
-    #else
-        system("clear");
-    #endif
-}
-
-void dungManHinh() {
-    cout << "\nNhan Enter de tiep tuc...";
-    cin.ignore();
-    cin.get();
-}
 
 void toUpperString(char* str) {
     for (int i = 0; str[i]; i++) {
@@ -352,16 +344,12 @@ void timKiemXe(Car carList[], int count) {
 }
 
 
-int main() {
+void ql1() {
     Car carList[MAX_CARS];
-    int count = 0;
-    
-    
+    int count = 0; 
     docFile(carList, count, "data_xe.txt");
-    
     int choice;
     do {
-        xoaManHinh();
         cout << "\n=== HE THONG QUAN LY XE ===\n";
         cout << "1. Them xe moi\n";
         cout << "2. Xem danh sach xe\n";
@@ -369,7 +357,7 @@ int main() {
         cout << "4. Xoa xe\n";
         cout << "5. Tim kiem xe\n";
         cout << "6. Luu du lieu\n";
-        cout << "0. Thoat\n";
+        cout << "0. Quay lại console\n";
         cout << "Nhap lua chon: ";
         
        
@@ -391,13 +379,574 @@ int main() {
             case 0: 
                 luuFile(carList, count, "data_xe.txt");
                 cout << ">> Da luu du lieu. Hen gap lai!\n";
-                break;
+                return;
             default: cout << ">> Lua chon khong hop le!\n";
-        }
-        
-        if (choice != 0) dungManHinh();
-        
+        }   
     } while (choice != 0);
+}
+const string FILE_NAME = "data_nv.txt";
+const int MAX_NHAN_VIEN = 100;
+
+struct NhanVien {
+    int ID;
+    string HoTen;
+    string ChucVu;
+    string GioiTinh;
+};
+
+NhanVien danhSach[MAX_NHAN_VIEN];
+int soLuongHienTai = 0; 
+
+string convert_to_line(const NhanVien& nv) {
+    return to_string(nv.ID) + "|" + nv.HoTen + "|" + nv.ChucVu + "|" + nv.GioiTinh;
+}
+
+NhanVien convert_to_struct(const string& line) {
+    NhanVien nv;
+    stringstream ss(line);
+    string segment;
+
+    getline(ss, segment, '|');
+    if (!segment.empty()) {
+        nv.ID = stoi(segment);
+    } else {
+        nv.ID = -1;
+    }
+
+    getline(ss, nv.HoTen, '|');
+    getline(ss, nv.ChucVu, '|');
+    getline(ss, nv.GioiTinh, '|');
+
+    return nv;
+}
+
+void doc_file() {
+    soLuongHienTai = 0;
+
+    ifstream file(FILE_NAME);
+    if (file.is_open()) {
+        string line;
+        while (getline(file, line) && soLuongHienTai < MAX_NHAN_VIEN) {
+            if (!line.empty()) {
+                danhSach[soLuongHienTai] = convert_to_struct(line);
+                soLuongHienTai++;
+            }
+        }
+        file.close();
+        cout << "\n>>> Đã đọc " << soLuongHienTai << " nhân viên từ file " << FILE_NAME << ".\n";
+    } else {
+        cout << "\n>>> Không tìm thấy file " << FILE_NAME << ". Dữ liệu sẽ được lưu khi thêm mới.\n";
+    }
+}
+
+void ghi_file() {
+    ofstream file(FILE_NAME);
+    if (file.is_open()) {
+        for (int i = 0; i < soLuongHienTai; ++i) {
+            file << convert_to_line(danhSach[i]) << "\n";
+        }
+        file.close();
+        cout << "\n>>> Đã ghi thành công dữ liệu vào file " << FILE_NAME << ".\n";
+    } else {
+        cerr << "\n>>> Lỗi: Không thể mở file để ghi.\n";
+    }
+}
+
+int tim_vi_tri_theo_id(int id) {
+    for (int i = 0; i < soLuongHienTai; ++i) {
+        if (danhSach[i].ID == id) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void them_nhan_vien() {
+    if (soLuongHienTai >= MAX_NHAN_VIEN) {
+        cout << "\n>>> Lỗi: Danh sách đầy, không thể thêm nữa!\n";
+        return;
+    }
+
+    NhanVien nv;
+    cout << "\n--- Thêm Nhân Viên ---\n";
+
+    int maxID = 0;
+    for (int i = 0; i < soLuongHienTai; ++i) {
+        if (danhSach[i].ID > maxID) {
+            maxID = danhSach[i].ID;
+        }
+    }
+    nv.ID = maxID + 1;
+    cout << "ID mới (Tự động): " << nv.ID << "\n";
+
+    cout << "Nhập Họ Tên: ";
+    cin.ignore(); 
+    getline(cin, nv.HoTen);
+
+    cout << "Nhập Chức Vụ: ";
+    getline(cin, nv.ChucVu);
+
+    cout << "Nhập Giới Tính: ";
+    getline(cin, nv.GioiTinh);
+
+    danhSach[soLuongHienTai] = nv;
+    soLuongHienTai++;
     
+    cout << "\n*** Thêm nhân viên thành công! ***\n";
+    ghi_file();
+}
+
+void xem_danh_sach() {
+    cout << "\n--- Danh Sách Nhân Viên ---\n";
+    if (soLuongHienTai == 0) {
+        cout << "Danh sách trống.\n";
+        return;
+    }
+
+    cout << setfill('-') << setw(55) << "-" << setfill(' ') << endl;
+    cout << "|" << setw(5) << left << "ID"
+         << "|" << setw(20) << left << "Họ Tên"
+         << "|" << setw(15) << left << "Chức Vụ"
+         << "|" << setw(10) << left << "Giới Tính"
+         << "|\n";
+    cout << setfill('-') << setw(55) << "-" << setfill(' ') << endl;
+
+    for (int i = 0; i < soLuongHienTai; ++i) {
+        const NhanVien& nv = danhSach[i];
+        cout << "|" << setw(5) << left << nv.ID
+             << "|" << setw(20) << left << nv.HoTen
+             << "|" << setw(15) << left << nv.ChucVu
+             << "|" << setw(10) << left << nv.GioiTinh
+             << "|\n";
+    }
+    cout << setfill('-') << setw(55) << "-" << setfill(' ') << endl;
+}
+
+void sua_nhan_vien() {
+    int idSua;
+    cout << "\n--- Sửa Thông Tin Nhân Viên ---\n";
+    cout << "Nhập ID nhân viên cần sửa: ";
+    if (!(cin >> idSua)) {
+        cout << "\n>>> Lỗi nhập liệu ID.\n";
+        cin.clear(); cin.ignore(10000, '\n'); return;
+    }
+    
+    int viTri = tim_vi_tri_theo_id(idSua);
+
+    if (viTri != -1) {
+        NhanVien& nv = danhSach[viTri];
+        cout << "Tìm thấy nhân viên: " << nv.HoTen << ". Bắt đầu sửa:\n";
+        cin.ignore(); 
+
+        cout << "Nhập Họ Tên mới (Enter để giữ nguyên [" << nv.HoTen << "]): ";
+        string hoTenMoi;
+        getline(cin, hoTenMoi);
+        if (!hoTenMoi.empty()) nv.HoTen = hoTenMoi;
+
+        cout << "Nhập Chức Vụ mới (Enter để giữ nguyên [" << nv.ChucVu << "]): ";
+        string chucVuMoi;
+        getline(cin, chucVuMoi);
+        if (!chucVuMoi.empty()) nv.ChucVu = chucVuMoi;
+
+        cout << "Nhập Giới Tính mới (Enter để giữ nguyên [" << nv.GioiTinh << "]): ";
+        string gioiTinhMoi;
+        getline(cin, gioiTinhMoi);
+        if (!gioiTinhMoi.empty()) nv.GioiTinh = gioiTinhMoi;
+
+        cout << "\n*** Sửa thông tin nhân viên ID " << idSua << " thành công! ***\n";
+        ghi_file();
+    } else {
+        cout << "\n>>> Không tìm thấy nhân viên có ID " << idSua << ".\n";
+    }
+}
+
+void xoa_nhan_vien() {
+    int idXoa;
+    cout << "\n--- Xóa Nhân Viên ---\n";
+    cout << "Nhập ID nhân viên cần xóa: ";
+    if (!(cin >> idXoa)) {
+        cout << "\n>>> Lỗi nhập liệu ID.\n";
+        cin.clear(); cin.ignore(10000, '\n'); return;
+    }
+
+    int viTri = tim_vi_tri_theo_id(idXoa);
+
+    if (viTri != -1) {
+        cout << "Xác nhận xóa nhân viên: " << danhSach[viTri].HoTen << " (Y/N)? ";
+        char confirm;
+        cin >> confirm;
+        
+        if (confirm == 'Y' || confirm == 'y') {
+            for (int i = viTri; i < soLuongHienTai - 1; ++i) {
+                danhSach[i] = danhSach[i + 1];
+            }
+            soLuongHienTai--;
+
+            cout << "\n*** Xóa nhân viên ID " << idXoa << " thành công! ***\n";
+            ghi_file();
+        } else {
+            cout << "Hủy thao tác xóa.\n";
+        }
+    } else {
+        cout << "\n>>> Không tìm thấy nhân viên có ID " << idXoa << ".\n";
+    }
+}
+
+void tim_nhan_vien() {
+    string tuKhoa;
+    cout << "\n--- Tìm Kiếm Nhân Viên ---\n";
+    cout << "Nhập từ khóa tìm kiếm (ID hoặc Họ Tên): ";
+    cin.ignore();
+    getline(cin, tuKhoa);
+
+    bool timThay = false;
+
+    cout << "\n*** Kết Quả Tìm Kiếm: ***\n";
+    
+    cout << setfill('-') << setw(55) << "-" << setfill(' ') << endl;
+    cout << "|" << setw(5) << left << "ID"
+         << "|" << setw(20) << left << "Họ Tên"
+         << "|" << setw(15) << left << "Chức Vụ"
+         << "|" << setw(10) << left << "Giới Tính"
+         << "|\n";
+    cout << setfill('-') << setw(55) << "-" << setfill(' ') << endl;
+
+
+    bool laID = true;
+    for (char c : tuKhoa) {
+        if (!isdigit(c)) {
+            laID = false;
+            break;
+        }
+    }
+
+    if (laID) {
+        try {
+            int idTim = stoi(tuKhoa);
+            int viTri = tim_vi_tri_theo_id(idTim);
+            if (viTri != -1) {
+                const NhanVien& nv = danhSach[viTri];
+                cout << "|" << setw(5) << left << nv.ID
+                     << "|" << setw(20) << left << nv.HoTen
+                     << "|" << setw(15) << left << nv.ChucVu
+                     << "|" << setw(10) << left << nv.GioiTinh
+                     << "|\n";
+                timThay = true;
+            }
+        } catch (...) {
+            laID = false;
+        }
+    }
+
+    if (!laID) {
+        for (int i = 0; i < soLuongHienTai; ++i) {
+            const NhanVien& nv = danhSach[i];
+
+            string hoTenLower = nv.HoTen;
+            string tuKhoaLower = tuKhoa;
+            transform(hoTenLower.begin(), hoTenLower.end(), hoTenLower.begin(), ::tolower);
+            transform(tuKhoaLower.begin(), tuKhoaLower.end(), tuKhoaLower.begin(), ::tolower);
+
+            if (hoTenLower.find(tuKhoaLower) != string::npos) {
+                cout << "|" << setw(5) << left << nv.ID
+                     << "|" << setw(20) << left << nv.HoTen
+                     << "|" << setw(15) << left << nv.ChucVu
+                     << "|" << setw(10) << left << nv.GioiTinh
+                     << "|\n";
+                timThay = true;
+            }
+        }
+    }
+    cout << setfill('-') << setw(55) << "-" << setfill(' ') << endl;
+
+
+    if (!timThay) {
+        cout << "\n>>> Không tìm thấy nhân viên nào với từ khóa: " << tuKhoa << ".\n";
+    }
+}
+void ql3(){
+    doc_file();
+
+    int luaChon;
+    do {
+        cout << "\n====================================\n";
+        cout << "          QUẢN LÝ NHÂN VIÊN         \n";
+        cout << "       (Tối đa " << MAX_NHAN_VIEN << " nhân viên)      \n";
+        cout << "====================================\n";
+        cout << "1. Thêm Nhân Viên\n";
+        cout << "2. Xem Danh Sách Nhân Viên\n";
+        cout << "3. Sửa Thông Tin Nhân Viên\n";
+        cout << "4. Xóa Nhân Viên\n";
+        cout << "5. Tìm Kiếm Nhân Viên\n";
+        cout << "0. quay lại cosole \n";
+        cout << "------------------------------------\n";
+        cout << "Nhập lựa chọn của bạn: ";
+        
+        if (!(cin >> luaChon)) {
+            cout << "\n>>> Lỗi nhập liệu. Vui lòng nhập số.\n";
+            cin.clear();
+            cin.ignore(10000, '\n');
+            luaChon = -1;
+            continue;
+        }
+
+        switch (luaChon) {
+            case 1:
+                them_nhan_vien();
+                break;
+            case 2:
+                xem_danh_sach();
+                break;
+            case 3:
+                sua_nhan_vien();
+                break;
+            case 4:
+                xoa_nhan_vien();
+                break;
+            case 5:
+                tim_nhan_vien();
+                break;
+            case 0:
+                cout << "\nĐã chọn Thoát. Dữ liệu đã được tự động lưu sau mỗi thao tác thêm/sửa/xóa.\n";
+                break;
+            default:
+                cout << "\n>>> Lựa chọn không hợp lệ. Vui lòng chọn lại.\n";
+                break;
+        }
+    } while (luaChon != 0);
+}
+
+const int MAX_CUSTOMERS = 100;
+
+
+struct Customer {
+    string id;
+    string name;
+    string phoneNum;
+    string personalId;
+    string address;
+    string gender;
+};
+
+Customer cusList[MAX_CUSTOMERS]; 
+int customerQuantity = 0;
+
+const string FILE_NAME1 = "data_khach.txt";
+
+void readFile() {
+    ifstream fileIn(FILE_NAME);
+    if (!fileIn.is_open()) return; 
+
+    customerQuantity = 0;
+    while(fileIn >> cusList[customerQuantity].id) {
+        fileIn.ignore(); 
+        getline(fileIn, cusList[customerQuantity].name);
+        getline(fileIn, cusList[customerQuantity].phoneNum);
+        getline(fileIn, cusList[customerQuantity].personalId);
+        getline(fileIn, cusList[customerQuantity].address);
+        getline(fileIn, cusList[customerQuantity].gender);
+        customerQuantity++;
+    }
+    fileIn.close();
+}
+
+void writeFile() {
+    ofstream fileOut(FILE_NAME);
+    for(int i = 0; i < customerQuantity; ++i) {
+        fileOut << cusList[i].id << "\n"
+                << cusList[i].name << "\n"
+                << cusList[i].phoneNum << "\n"
+                << cusList[i].personalId << "\n"
+                << cusList[i].address << "\n"
+                << cusList[i].gender << "\n";
+    }
+    fileOut.close();
+}
+
+void addCustomer() {
+    if (customerQuantity >= MAX_CUSTOMERS) {
+        cout << "Danh sách đã đầy!\n";
+        return;
+    }
+    Customer cus;
+    cout << "--- NHẬP THÔNG TIN KHÁCH ---\n";
+    cout << "Nhập ID: "; getline(cin, cus.id);
+    
+    for(int i=0; i<customerQuantity; i++) {
+        if(cusList[i].id == cus.id) {
+            cout << "Lỗi: ID đã tồn tại!\n"; return;
+        }
+    }
+
+    cout << "Nhập Họ và tên: "; getline(cin, cus.name);
+    cout << "Nhập SĐT: "; getline(cin, cus.phoneNum);
+    cout << "Nhập mã CCCD: "; getline(cin, cus.personalId);
+    cout << "Nhập địa chỉ: "; getline(cin, cus.address);
+    cout << "Nhập giới tính: "; getline(cin, cus.gender);
+    
+    cusList[customerQuantity++] = cus;
+    writeFile();
+    cout << "\n>>> Thêm khách hàng thành công!\n";
+}
+
+void showList() {
+    cout << "\n--- DANH SÁCH KHÁCH HÀNG (" << customerQuantity << ") ---\n";
+    cout << left << setw(10) << "ID" << setw(20) << "Ho Ten" << setw(15) << "SDT" 
+         << setw(15) << "CCCD" << setw(20) << "Dia Chi" << setw(10) << "Gioi Tinh" << endl;
+    cout << string(90, '-') << endl;
+
+    for(int i = 0; i < customerQuantity; ++i) {
+        cout << left 
+             << setw(10) << cusList[i].id 
+             << setw(20) << cusList[i].name 
+             << setw(15) << cusList[i].phoneNum 
+             << setw(15) << cusList[i].personalId 
+             << setw(20) << cusList[i].address 
+             << setw(10) << cusList[i].gender << endl;
+    }
+    cout << string(90, '-') << endl;
+}
+
+void findCustomer(string id) {
+    bool found = false;
+    cout << string(90, '-') << endl;
+    for (int i = 0; i < customerQuantity; ++i) {
+        if (cusList[i].id == id) {
+            cout << "| " << setw(8) << cusList[i].id 
+                 << "| " << setw(18) << cusList[i].name 
+                 << "| " << setw(13) << cusList[i].phoneNum 
+                 << "| " << setw(13) << cusList[i].personalId 
+                 << "| " << setw(18) << cusList[i].address 
+                 << "| " << setw(9) << cusList[i].gender << "|\n";
+            found = true;
+        }
+    }
+    if (!found) cout << "\n>>> Không tìm thấy khách hàng với ID này!\n";
+    cout << string(90, '-') << endl;
+}
+
+void fixCustomer(string id) {
+    for (int i = 0; i < customerQuantity; ++i) {
+        if (cusList[i].id == id) {
+            cout << "\n>>> Nhập thông tin mới cho ID " << id << " (Enter để giữ nguyên):\n";
+            
+            string temp;
+            cout << "Họ và tên (" << cusList[i].name << "): "; 
+            getline(cin, temp); if(!temp.empty()) cusList[i].name = temp;
+
+            cout << "SĐT (" << cusList[i].phoneNum << "): "; 
+            getline(cin, temp); if(!temp.empty()) cusList[i].phoneNum = temp;
+
+            cout << "CCCD (" << cusList[i].personalId << "): "; 
+            getline(cin, temp); if(!temp.empty()) cusList[i].personalId = temp;
+
+            cout << "Địa chỉ (" << cusList[i].address << "): "; 
+            getline(cin, temp); if(!temp.empty()) cusList[i].address = temp;
+
+            cout << "Giới tính (" << cusList[i].gender << "): "; 
+            getline(cin, temp); if(!temp.empty()) cusList[i].gender = temp;
+
+            writeFile();
+            cout << "\n>>> Sửa thông tin thành công!\n";
+            return;
+        }
+    }
+    cout << "\n>>> Không tìm thấy khách hàng để sửa!\n";
+}
+
+void deleteCustomer(string id) {
+    for (int i = 0; i < customerQuantity; ++i) {
+        if (cusList[i].id == id) {
+            cout << "Bạn có chắc muốn xóa khách hàng " << cusList[i].name << "? (y/n): ";
+            char confirm; cin >> confirm; cin.ignore(); 
+            
+            if (confirm == 'y' || confirm == 'Y') {
+                for (int j = i; j < customerQuantity - 1; j++) {
+                    cusList[j] = cusList[j + 1];
+                }
+                --customerQuantity;
+                writeFile();
+                cout << "\n>>> Xóa khách hàng thành công!\n";
+            } else {
+                cout << "\n>>> Đã hủy xóa.\n";
+            }
+            return;
+        }
+    }
+    cout << "\n>>> Không tìm thấy khách hàng để xóa!\n";
+}
+
+
+void ql2() { 
+    readFile(); 
+    int choose;
+    do {
+        cout << "\n========================================\n";
+        cout << "        QUẢN LÝ KHÁCH HÀNG\n";
+        cout << "========================================\n";
+        cout << " [1] Thêm khách hàng\n";
+        cout << " [2] Xem danh sách khách hàng\n";
+        cout << " [3] Tìm khách hàng theo ID\n";
+        cout << " [4] Sửa thông tin khách hàng\n";
+        cout << " [5] Xoá khách hàng\n";
+        cout << " [0] Quay lại Menu chính\n";
+        cout << "Nhập lựa chọn: ";
+        cin >> choose; 
+        
+       
+        cin.ignore();
+        
+        switch (choose) {
+            case 1: addCustomer(); break;
+            case 2: showList(); break;
+            case 3: {
+                string id; cout << "Nhập ID cần tìm: "; getline(cin, id);
+                findCustomer(id); break;
+            }
+            case 4: {
+                string id; cout << "Nhập ID cần sửa: "; getline(cin, id);
+                fixCustomer(id); break;
+            }
+            case 5: {
+                string id; cout << "Nhập ID cần xóa: "; getline(cin, id);
+                deleteCustomer(id); break;
+            }
+            case 0: cout << "Đang quay lại...\n"; return;
+            default: cout << "Lựa chọn không hợp lệ!\n";
+        }
+    } while (choose != 0);
+}
+
+int main(){
+    int choice;
+    do{
+        xoaManHinh();
+        cout << "\n-----CHÀO MỪNG BẠN ĐẾN VỚI CONSOLE QUẢN LÝ SHOWROOM Ô TÔ-----" << endl;
+        cout << "1. Quản lý Ô TÔ. " << endl;
+        cout << "2. Quản lý khách hàng. "<< endl;
+        cout << "3. Quản lý nhân viên. " << endl;
+        cout << "0. để thoát chương trình. " << endl;
+        cout << "nhập vào lựa chọn của bạn : " ;
+        cin >> choice;
+        switch(choice){
+        case 1 :
+            ql1();
+            break;
+        case 2:
+            ql2();
+            break;
+        case 3:
+            ql3();
+            break;
+        case 0 : 
+            cout << "chương trình đang thoát nhấn enter để kết thúc. ";
+            cin.ignore();
+            cin.get();
+            break;
+        default :
+            cout << "lựa chọn của bạn không hợp lệ vui lòng chọn lại nhé!! " ;
+            break;
+    }
+    }while( choice != 0 );
     return 0;
 }
