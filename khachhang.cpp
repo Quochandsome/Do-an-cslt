@@ -5,10 +5,6 @@
 
 using std::cout, std::cin, std::string, std::getline, std::ifstream, std::ofstream, std::setw, std::left, std::right;
 
-const int MAX_CUSTOMERS = 100;
-Customer cusList[MAX_CUSTMERS];
-int customerQuantity = 0;
-
 struct Customer {
     string id;
     string name;
@@ -17,6 +13,10 @@ struct Customer {
     string address;
     string gender;
 };
+
+const int MAX_CUSTOMERS = 100;
+Customer cusList[MAX_CUSTOMERS];
+int customerQuantity = 0;
 
 void readFile() {
     ifstream fileIn("data_khach.txt");
@@ -138,6 +138,9 @@ int main() {
         cout << " [2] Xem danh sách khách hàng\n";
         cout << " [3] Tìm khách hàng theo ID\n";
         cout << " [4] Sửa thông tin khách hàng\n";
+        cout << " [5] Xóa thông tin khách hàng\n";
+        getline(cin, buffer);
+        choose = stoi(buffer);
         switch (choose) {
             case 1: {
                 addCustomer();
