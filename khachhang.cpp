@@ -148,20 +148,23 @@ int main() {
                 break;
             }
             case 3: {
-                int id; 
-                cout << "Hãy nhập ID khách hàng cần tìm: "; cin >> id;
+                string id; 
+                cout << "Hãy nhập ID khách hàng cần tìm: "; 
+                getline(cin, id);
                 findCustomer(id);
                 break;
             }
             case 4: {
-                int id; 
-                cout << "Hãy nhập ID khách hàng cần sửa: "; cin >> id;
+                string id; 
+                cout << "Hãy nhập ID khách hàng cần sửa: "; 
+                getline(cin, id);
                 fixCustomer(id);
                 break;
             }
             case 5: {
-                int id; 
-                cout << "Hãy nhập ID khách hàng cần xóa: "; cin >> id;
+                string id; 
+                cout << "Hãy nhập ID khách hàng cần xóa: "; 
+                getline(cin, id);
                 deleteCustomer(id);
                 break;
             }
