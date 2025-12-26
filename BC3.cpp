@@ -56,7 +56,7 @@ void baoCaoHangXeTheoThang() {
     int soLuongChayNhat = 0;
     int soLuongENhat = INT_MAX;
     
-    vector<pair<string, int>> danhSachHangXe; // Để lưu và sắp xếp
+    vector<pair<string, int>> danhSachHangXe; 
     
     cout << "THỐNG KÊ CHI TIẾT THEO HÃNG XE" << endl;
     cout << string(50, '-') << endl;
