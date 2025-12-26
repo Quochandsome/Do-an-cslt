@@ -3,7 +3,7 @@ void baoCaoHangXeTheoThang() {
     docFileHoaDon(); // ê tui không biết nên để tên gì nên để đại nha
     
     if (invoiceCount == 0) {
-        cout << "Chưa có hóa đơn nào trong tháng để thống kê!\n";
+        cout << "Chưa có hóa đơn nào trong tháng để thống kê!" << endl;
         return;
     }
     
