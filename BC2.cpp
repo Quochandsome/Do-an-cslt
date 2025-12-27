@@ -23,12 +23,14 @@ void BC2_ThongKeHangXeTheoThang() {
 
     char tiepTuc;
     do {
-        int thang;
+        int thang, nam;
         cout << "\nNhập tháng cần thống kê (1-12): ";
         cin >> thang;
+        cout << "Nhập năm cần thống kê: ";
+        cin >> nam;
 
-        if (thang < 1 || thang > 12) {
-            cout << "Tháng không hợp lệ!\n";
+        if (thang < 1 || thang > 12 || nam <= 0) {
+            cout << "Tháng hoặc năm không hợp lệ!\n";
         } 
         else {
             string brands[100];
@@ -36,7 +38,7 @@ void BC2_ThongKeHangXeTheoThang() {
             double tongGia[100] = {0};
             int tongHang = 0;
 
-            
+            // ===== BƯỚC 1: THỐNG KÊ THEO HÃNG =====
             for (int k = 0; k < soHoaDon; k++) {
                 stringstream ss(hoaDon[k]);
                 string idKhach, tenKhach, idXe, hangModel, giaStr, ngay;
@@ -49,7 +51,9 @@ void BC2_ThongKeHangXeTheoThang() {
                 getline(ss, ngay);
 
                 int thangBan = stoi(ngay.substr(3, 2));
-                if (thangBan != thang) continue;
+                int namBan   = stoi(ngay.substr(6, 4));
+
+                if (thangBan != thang || namBan != nam) continue;
 
                 string hang = hangModel.substr(0, hangModel.find('-'));
                 double gia = stod(giaStr);
@@ -73,16 +77,17 @@ void BC2_ThongKeHangXeTheoThang() {
             }
 
             if (tongHang == 0) {
-                cout << "Không có xe nào được bán trong tháng " << thang << ".\n";
+                cout << "Không có xe nào được bán trong "
+                     << thang << "/" << nam << ".\n";
             } 
             else {
-                cout << "\n--- THỐNG KÊ BÁN XE THEO HÃNG (THÁNG "
-                     << thang << ") ---\n";
+                cout << "\n--- THỐNG KÊ BÁN XE THEO HÃNG ("
+                     << thang << "/" << nam << ") ---\n";
                 cout << string(55, '-') << endl;
 
                 double doanhThuThang = 0;
 
-                
+                // ===== BƯỚC 2: IN CHI TIẾT =====
                 for (int i = 0; i < tongHang; i++) {
                     cout << brands[i] << endl;
 
@@ -101,14 +106,15 @@ void BC2_ThongKeHangXeTheoThang() {
                         getline(ss, ngay);
 
                         int thangBan = stoi(ngay.substr(3, 2));
-                        if (thangBan != thang) continue;
+                        int namBan   = stoi(ngay.substr(6, 4));
+
+                        if (thangBan != thang || namBan != nam) continue;
 
                         string hang = hangModel.substr(0, hangModel.find('-'));
                         if (hang != brands[i]) continue;
 
                         string model = hangModel.substr(hangModel.find('-') + 1);
 
-                        
                         bool daIn = false;
                         for (int m = 0; m < soModelDaIn; m++) {
                             if (modelDaIn[m] == model) {
@@ -121,7 +127,6 @@ void BC2_ThongKeHangXeTheoThang() {
                         int dem = 0;
                         double gia = 0;
 
-                        
                         for (int j = 0; j < soHoaDon; j++) {
                             stringstream ss2(hoaDon[j]);
                             string idK, tenK, idX, hm, g, n;
@@ -134,7 +139,8 @@ void BC2_ThongKeHangXeTheoThang() {
                             getline(ss2, n);
 
                             int t = stoi(n.substr(3, 2));
-                            if (t != thang) continue;
+                            int y = stoi(n.substr(6, 4));
+                            if (t != thang || y != nam) continue;
 
                             string h = hm.substr(0, hm.find('-'));
                             string m = hm.substr(hm.find('-') + 1);
@@ -164,13 +170,14 @@ void BC2_ThongKeHangXeTheoThang() {
                 }
 
                 cout << string(55, '-') << endl;
-                cout << "DOANH THU THÁNG " << thang << " : "
+                cout << "DOANH THU THÁNG "
+                     << thang << "/" << nam << " : "
                      << fixed << setprecision(0)
                      << doanhThuThang << " Tr VND\n";
             }
         }
 
-        cout << "\nXem thống kê tháng khác? (y/n): ";
+        cout << "\nXem thống kê tháng/năm khác? (y/n): ";
         cin >> tiepTuc;
 
     } while (tiepTuc == 'y' || tiepTuc == 'Y');
