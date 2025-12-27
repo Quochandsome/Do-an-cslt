@@ -916,9 +916,7 @@ void ql2() {
         }
     } while (choose != 0);
 }
-
 void ql4() {
-    
     Car dsXeTam[MAX_CARS];
     int slXeTam = 0;
     
@@ -930,13 +928,12 @@ void ql4() {
     cout << "           TAO HOA DON BAN XE           \n";
     cout << "----------------------------------------\n";
 
-   
+    
     string idKhach;
     cout << "Nhap ID Khach hang: ";
     if (cin.peek() == '\n') cin.ignore();
     getline(cin, idKhach);
 
-   
     bool timThayKhach = false;
     string tenKhach = "";
     
@@ -957,7 +954,6 @@ void ql4() {
     }
     cout << ">> Da chon khach hang: " << tenKhach << endl;
 
-   
     int idXe;
     cout << "Nhap ID Xe muon mua: ";
     if (!(cin >> idXe)) {
@@ -966,7 +962,6 @@ void ql4() {
         return;
     }
 
-   
     int viTri = timViTriTheoID(dsXeTam, slXeTam, idXe);
     if (viTri == -1) {
         cout << ">> LOI: Khong tim thay xe ID [" << idXe << "] trong kho!\n";
@@ -980,7 +975,6 @@ void ql4() {
     strcpy(statusCheck, dsXeTam[viTri].status);
     toUpperString(statusCheck); 
 
-    
     if (strstr(statusCheck, "DA BAN") != NULL) {
         cout << ">> LOI: Xe nay DA BAN roi, khong the tao hoa don!\n";
         cout << "Nhan Enter de quay lai...";
@@ -988,9 +982,16 @@ void ql4() {
         return;
     }
 
-   
+  
+    string ngayLap;
+    cout << "Nhap ngay lap hoa don (dd/mm/yyyy): ";
+    cin.ignore(); 
+    getline(cin, ngayLap);
+
+  
     cout << "----------------------------------------\n";
     cout << "THONG TIN GIAO DICH:\n";
+    cout << "- Ngay lap: " << ngayLap << endl;
     cout << "- Khach hang: " << tenKhach << endl;
     cout << "- Xe: " << dsXeTam[viTri].brand << " " << dsXeTam[viTri].model << endl;
     cout << "- Gia ban: " << (long long)dsXeTam[viTri].price << " VND\n";
@@ -1000,20 +1001,21 @@ void ql4() {
     cin >> xacNhan;
 
     if (xacNhan == 'y' || xacNhan == 'Y') {
-       
+
         strcpy(dsXeTam[viTri].status, "Da ban");
 
-       
+   
         luuFile(dsXeTam, slXeTam, "data_xe.txt");
 
-   
+     
         ofstream fileHD("hoadon.txt", ios::app); 
         if (fileHD.is_open()) {
             fileHD << idKhach << "|" 
                    << tenKhach << "|" 
                    << idXe << "|" 
                    << dsXeTam[viTri].brand << "-" << dsXeTam[viTri].model << "|"
-                   << fixed << setprecision(0) << dsXeTam[viTri].price << "\n";
+                   << fixed << setprecision(0) << dsXeTam[viTri].price << "|"
+                   << ngayLap << "\n"; 
             fileHD.close();
             cout << "\n>> GIAO DICH THANH CONG! Hoa don da duoc luu.\n";
         } else {
@@ -1022,7 +1024,6 @@ void ql4() {
     } else {
         cout << "\n>> Da huy giao dich.\n";
     }
-    
     
     cout << "Nhan Enter de tiep tuc...";
     cin.ignore(); cin.get();
