@@ -734,7 +734,7 @@ int customerQuantity = 0;
 const string FILE_NAME1 = "data_khach.txt";
 
 void readFile() {
-    ifstream fileIn(FILE_NAME);
+    ifstream fileIn(FILE_NAME1); 
     if (!fileIn.is_open()) return; 
 
     customerQuantity = 0;
@@ -751,7 +751,7 @@ void readFile() {
 }
 
 void writeFile() {
-    ofstream fileOut(FILE_NAME);
+    ofstream fileOut(FILE_NAME1); 
     for(int i = 0; i < customerQuantity; ++i) {
         fileOut << cusList[i].id << "\n"
                 << cusList[i].name << "\n"
@@ -916,7 +916,118 @@ void ql2() {
         }
     } while (choose != 0);
 }
+void ql4() {
+    Car dsXeTam[MAX_CARS];
+    int slXeTam = 0;
+    
+    
+    docFile(dsXeTam, slXeTam, "data_xe.txt"); 
+    readFile(); 
 
+    cout << "\n----------------------------------------\n";
+    cout << "           TAO HOA DON BAN XE           \n";
+    cout << "----------------------------------------\n";
+
+    
+    string idKhach;
+    cout << "Nhap ID Khach hang: ";
+    if (cin.peek() == '\n') cin.ignore();
+    getline(cin, idKhach);
+
+    bool timThayKhach = false;
+    string tenKhach = "";
+    
+    for (int i = 0; i < customerQuantity; i++) {
+        if (cusList[i].id == idKhach) {
+            timThayKhach = true;
+            tenKhach = cusList[i].name;
+            break;
+        }
+    }
+
+    if (!timThayKhach) {
+        cout << ">> LOI: Khong tim thay khach hang ID [" << idKhach << "]!\n";
+        cout << ">> Vui long them khach hang o chuc nang so 2 truoc.\n";
+        cout << "Nhan Enter de quay lai...";
+        cin.ignore(); cin.get();
+        return;
+    }
+    cout << ">> Da chon khach hang: " << tenKhach << endl;
+
+    int idXe;
+    cout << "Nhap ID Xe muon mua: ";
+    if (!(cin >> idXe)) {
+        cout << ">> LOI: ID xe phai la so nguyen!\n";
+        cin.clear(); cin.ignore(1000, '\n');
+        return;
+    }
+
+    int viTri = timViTriTheoID(dsXeTam, slXeTam, idXe);
+    if (viTri == -1) {
+        cout << ">> LOI: Khong tim thay xe ID [" << idXe << "] trong kho!\n";
+        cout << "Nhan Enter de quay lai...";
+        cin.ignore(); cin.get();
+        return;
+    }
+
+   
+    char statusCheck[20];
+    strcpy(statusCheck, dsXeTam[viTri].status);
+    toUpperString(statusCheck); 
+
+    if (strstr(statusCheck, "DA BAN") != NULL) {
+        cout << ">> LOI: Xe nay DA BAN roi, khong the tao hoa don!\n";
+        cout << "Nhan Enter de quay lai...";
+        cin.ignore(); cin.get();
+        return;
+    }
+
+  
+    string ngayLap;
+    cout << "Nhap ngay lap hoa don (dd/mm/yyyy): ";
+    cin.ignore(); 
+    getline(cin, ngayLap);
+
+  
+    cout << "----------------------------------------\n";
+    cout << "THONG TIN GIAO DICH:\n";
+    cout << "- Ngay bán: " << ngayLap << endl;
+    cout << "- Khach hang: " << tenKhach << endl;
+    cout << "- Xe: " << dsXeTam[viTri].brand << " " << dsXeTam[viTri].model << endl;
+    cout << "- Gia ban: " << (long long)dsXeTam[viTri].price << " VND\n";
+    cout << "----------------------------------------\n";
+    cout << "Xac nhan ban xe nay? (y/n): ";
+    char xacNhan;
+    cin >> xacNhan;
+
+    if (xacNhan == 'y' || xacNhan == 'Y') {
+
+        strcpy(dsXeTam[viTri].status, "Da ban");
+
+   
+        luuFile(dsXeTam, slXeTam, "data_xe.txt");
+
+     
+        ofstream fileHD("hoadon.txt", ios::app); 
+        if (fileHD.is_open()) {
+            fileHD << idKhach << "|" 
+                   << tenKhach << "|" 
+                   << idXe << "|" 
+                   << dsXeTam[viTri].brand << "-" << dsXeTam[viTri].model << "|"
+                   << fixed << setprecision(0) << dsXeTam[viTri].price << "|"
+                   << ngayLap << "\n"; 
+            fileHD.close();
+            cout << "\n>> GIAO DICH THANH CONG! Hoa don da duoc luu.\n";
+        } else {
+            cout << "\n>> LOI: Khong the mo file hoadon.txt de luu!\n";
+        }
+    } else {
+        cout << "\n>> Da huy giao dich.\n";
+    }
+    
+    cout << "Nhan Enter de tiep tuc...";
+    cin.ignore(); cin.get();
+}
 int main(){
     int choice;
     do{
@@ -925,6 +1036,7 @@ int main(){
         cout << "1. Quản lý Ô TÔ. " << endl;
         cout << "2. Quản lý khách hàng. "<< endl;
         cout << "3. Quản lý nhân viên. " << endl;
+        cout << "4, Tạo hoá đơn bán xe" << endl;
         cout << "0. để thoát chương trình. " << endl;
         cout << "nhập vào lựa chọn của bạn : " ;
         cin >> choice;
@@ -937,6 +1049,9 @@ int main(){
             break;
         case 3:
             ql3();
+            break;
+        case 4:
+            ql4(); 
             break;
         case 0 : 
             cout << "chương trình đang thoát nhấn enter để kết thúc. ";
