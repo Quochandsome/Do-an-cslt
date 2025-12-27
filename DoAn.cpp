@@ -343,6 +343,54 @@ void timKiemXe(Car carList[], int count) {
     else cout << ">> Khong tim thay xe nao.\n";
 }
 
+void thongKeConHangVaDaBan(Car carList[], int count) {
+    if(count == 0) {
+        cout << "Danh sách trống";
+    }
+    int conHang = 0;
+    int daBan = 0;
+    
+//In danh sách xe còn hàng
+    cout << "\n--- XE CÒN HÀNG ---\n";
+    inTieuDeBang();
+    
+//Copy trạng thái của danh sách carList vào status, sau đó check nếu status của chiếc đó là "còn hàng" thì in ra các thông tin của xe đó
+//Sau đó tăng biến conHang
+    for(int i = 0; i <= count - 1; ++i) {
+        char status[20];
+        strcpy(status, carList[i].status);
+        toUpperString(status);
+        
+        if(strcmp(status, "Còn hàng") == 0) {
+            inThongTinXe(carList[i]);
+            ++conHang;
+        }
+    }
+    
+    cout << string(95, '-') << "\n";
+ 
+ //In danh sách xe đã bán
+    cout << "\n--- XE ĐÃ BÁN ---\n";
+    inTieuDeBang();
+  
+//Copy trạng thái của danh sách carList vào status, sau đó check nếu status của chiếc đó là "Đã bán" thì in ra các thông tin của xe đó
+//Sau đó tăng biến daBan  
+    for(int i = 0; i <= count - 1; ++i) {
+        char status[20];
+        strcpy(status, carList[i].status);
+        toUpperString(status);
+        
+        if(strcmp(status, "Đã bán") == 0) {
+            inThongTinXe(carList[i]);
+            ++daBan;
+        }
+    }
+    
+    cout << string(95, '-');
+    cout << "\n>>> Tổng kết:\n"; 
+    cout << "Số lượng xe còn trong kho: " << conHang << "\n"; 
+    cout << "Số lượng xe đã bán : " << daBan << "\n";
+}
 
 void ql1() {
     Car carList[MAX_CARS];
@@ -350,15 +398,16 @@ void ql1() {
     docFile(carList, count, "data_xe.txt");
     int choice;
     do {
-        cout << "\n=== HE THONG QUAN LY XE ===\n";
-        cout << "1. Them xe moi\n";
-        cout << "2. Xem danh sach xe\n";
-        cout << "3. Sua thong tin xe\n";
-        cout << "4. Xoa xe\n";
-        cout << "5. Tim kiem xe\n";
-        cout << "6. Luu du lieu\n";
+        cout << "\n=== HỆ THỐNG QUẢN LÝ XE ===\n";
+        cout << "1. Thêm xe mới\n";
+        cout << "2. Xem danh sách xe\n";
+        cout << "3. Sửa thông tin xe\n";
+        cout << "4. Xóa xe\n";
+        cout << "5. Tìm kiếm xe\n";
+        cout << "6. Lưu dữ liệu\n";
+        cout << "7. Thống kê xe còn trong kho và đã bán\n";
         cout << "0. Quay lại console\n";
-        cout << "Nhap lua chon: ";
+        cout << "Nhập lựa chọn: ";
         
        
         if (!(cin >> choice)) {
@@ -375,6 +424,9 @@ void ql1() {
             case 6: 
                 luuFile(carList, count, "data_xe.txt");
                 cout << ">> DA LUU DU LIEU!\n";
+                break;
+            case 7: 
+                thongKeXeConVaDaBan(carList, count);
                 break;
             case 0: 
                 luuFile(carList, count, "data_xe.txt");
