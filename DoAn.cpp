@@ -7,6 +7,9 @@
 #include <cstdlib>
 #include <cctype>
 #include<algorithm>
+#include <vector>   
+#include <map>      
+#include <climits>
 using namespace std;
 #define MAX_CARS 100
 void xoaManHinh() {
@@ -343,54 +346,6 @@ void timKiemXe(Car carList[], int count) {
     else cout << ">> Khong tim thay xe nao.\n";
 }
 
-void thongKeConHangVaDaBan(Car carList[], int count) {
-    if(count == 0) {
-        cout << "Danh sách trống";
-    }
-    int conHang = 0;
-    int daBan = 0;
-    
-//In danh sách xe còn hàng
-    cout << "\n--- XE CÒN HÀNG ---\n";
-    inTieuDeBang();
-    
-//Copy trạng thái của danh sách carList vào status, sau đó check nếu status của chiếc đó là "còn hàng" thì in ra các thông tin của xe đó
-//Sau đó tăng biến conHang
-    for(int i = 0; i <= count - 1; ++i) {
-        char status[20];
-        strcpy(status, carList[i].status);
-        toUpperString(status);
-        
-        if(strcmp(status, "Còn hàng") == 0) {
-            inThongTinXe(carList[i]);
-            ++conHang;
-        }
-    }
-    
-    cout << string(95, '-') << "\n";
- 
- //In danh sách xe đã bán
-    cout << "\n--- XE ĐÃ BÁN ---\n";
-    inTieuDeBang();
-  
-//Copy trạng thái của danh sách carList vào status, sau đó check nếu status của chiếc đó là "Đã bán" thì in ra các thông tin của xe đó
-//Sau đó tăng biến daBan  
-    for(int i = 0; i <= count - 1; ++i) {
-        char status[20];
-        strcpy(status, carList[i].status);
-        toUpperString(status);
-        
-        if(strcmp(status, "Đã bán") == 0) {
-            inThongTinXe(carList[i]);
-            ++daBan;
-        }
-    }
-    
-    cout << string(95, '-');
-    cout << "\n>>> Tổng kết:\n"; 
-    cout << "Số lượng xe còn trong kho: " << conHang << "\n"; 
-    cout << "Số lượng xe đã bán : " << daBan << "\n";
-}
 
 void ql1() {
     Car carList[MAX_CARS];
@@ -398,16 +353,17 @@ void ql1() {
     docFile(carList, count, "data_xe.txt");
     int choice;
     do {
-        cout << "\n=== HỆ THỐNG QUẢN LÝ XE ===\n";
-        cout << "1. Thêm xe mới\n";
-        cout << "2. Xem danh sách xe\n";
-        cout << "3. Sửa thông tin xe\n";
-        cout << "4. Xóa xe\n";
-        cout << "5. Tìm kiếm xe\n";
-        cout << "6. Lưu dữ liệu\n";
-        cout << "7. Thống kê xe còn trong kho và đã bán\n";
-        cout << "0. Quay lại console\n";
-        cout << "Nhập lựa chọn: ";
+        cout << "\n========================================\n";
+        cout << "        QUẢN LÝ XE\n";
+        cout << "========================================\n";
+        cout << "[1]. Them xe moi\n";
+        cout << "[2]. Xem danh sach xe\n";
+        cout << "[3]. Sua thong tin xe\n";
+        cout << "[4]. Xoa xe\n";
+        cout << "[5]. Tim kiem xe\n";
+        cout << "[6]. Luu du lieu\n";
+        cout << "[0]. Quay lại console\n";
+        cout << "Nhap lua chon: ";
         
        
         if (!(cin >> choice)) {
@@ -424,9 +380,6 @@ void ql1() {
             case 6: 
                 luuFile(carList, count, "data_xe.txt");
                 cout << ">> DA LUU DU LIEU!\n";
-                break;
-            case 7: 
-                thongKeXeConVaDaBan(carList, count);
                 break;
             case 0: 
                 luuFile(carList, count, "data_xe.txt");
@@ -723,14 +676,13 @@ void ql3(){
     do {
         cout << "\n====================================\n";
         cout << "          QUẢN LÝ NHÂN VIÊN         \n";
-        cout << "       (Tối đa " << MAX_NHAN_VIEN << " nhân viên)      \n";
         cout << "====================================\n";
-        cout << "1. Thêm Nhân Viên\n";
-        cout << "2. Xem Danh Sách Nhân Viên\n";
-        cout << "3. Sửa Thông Tin Nhân Viên\n";
-        cout << "4. Xóa Nhân Viên\n";
-        cout << "5. Tìm Kiếm Nhân Viên\n";
-        cout << "0. quay lại cosole \n";
+        cout << "[1]. Thêm Nhân Viên\n";
+        cout << "[2]. Xem Danh Sách Nhân Viên\n";
+        cout << "[3]. Sửa Thông Tin Nhân Viên\n";
+        cout << "[4]. Xóa Nhân Viên\n";
+        cout << "[5]. Tìm Kiếm Nhân Viên\n";
+        cout << "[0]. quay lại cosole \n";
         cout << "------------------------------------\n";
         cout << "Nhập lựa chọn của bạn: ";
         
@@ -1080,17 +1032,387 @@ void ql4() {
     cout << "Nhan Enter de tiep tuc...";
     cin.ignore(); cin.get();
 }
+struct HoaDonFull {
+    string idKhach, tenKhach, idXe, brand, model, ngay;
+    double gia;
+};
+
+
+void ghiTieuDeChung(int thang, int nam) {
+    ofstream fileOut("Baocao&Thongke.txt", ios::out); 
+    if (fileOut.is_open()) {
+        fileOut << "********************************************************\n";
+        fileOut << "       BAO CAO VA THONG KE DOANH THU THANG " << thang << "/" << nam << "\n";
+        fileOut << "       Thoi gian xuat: " << __DATE__ << " " << __TIME__ << "\n";
+        fileOut << "********************************************************\n\n";
+        fileOut.close();
+    }
+}
+
+
+void bc1() {
+    ifstream file("hoadon.txt");
+    if (!file.is_open()) {
+        cout << ">> Loi: Khong mo duoc file hoadon.txt\n";
+        return;
+    }
+
+    vector<HoaDonFull> listHD;
+    string line;
+    
+    
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+        stringstream ss(line);
+        string segment;
+        vector<string> parts;
+        while(getline(ss, segment, '|')) parts.push_back(segment);
+
+        if(parts.size() >= 6) {
+            HoaDonFull hd;
+            hd.idKhach = parts[0];
+            hd.tenKhach = parts[1];
+            hd.idXe = parts[2];
+            
+            
+            string hangModel = parts[3];
+            size_t dash = hangModel.find('-');
+            if (dash != string::npos) {
+                hd.brand = hangModel.substr(0, dash);
+                hd.model = hangModel.substr(dash + 1);
+            } else {
+                hd.brand = hangModel;
+                hd.model = "Unknown";
+            }
+            
+            hd.gia = stod(parts[4]);
+            hd.ngay = parts[5];
+            listHD.push_back(hd);
+        }
+    }
+    file.close();
+
+    if (listHD.empty()) {
+        cout << ">> Khong co hoa don nao!\n";
+        return;
+    }
+
+    
+    int thang, nam;
+    cout << "\n--- [BC1] THONG KE DOANH THU CHI TIET ---\n";
+    cout << "Nhap thang can thong ke (1-12): "; cin >> thang;
+    cout << "Nhap nam can thong ke: "; cin >> nam;
+
+    
+    ghiTieuDeChung(thang, nam);
+
+    
+    vector<HoaDonFull> listLoc;
+    vector<string> listBrandUnique; 
+    
+    for(const auto& hd : listHD) {
+        if (hd.ngay.length() >= 10) {
+            int t = stoi(hd.ngay.substr(3, 2));
+            int n = stoi(hd.ngay.substr(6, 4));
+            if (t == thang && n == nam) {
+                listLoc.push_back(hd);
+                
+                
+                bool exists = false;
+                for(const string& b : listBrandUnique) if(b == hd.brand) exists = true;
+                if(!exists) listBrandUnique.push_back(hd.brand);
+            }
+        }
+    }
+
+    ofstream fileOut("Baocao&Thongke.txt", ios::app); 
+    if (!fileOut.is_open()) return;
+
+    fileOut << "=== [BC1] CHI TIET DOANH THU THEO HANG VA DONG XE ===\n";
+    
+    if (listLoc.empty()) {
+        fileOut << "Khong co xe nao duoc ban trong thoi gian nay.\n";
+        cout << ">> Khong co du lieu!\n";
+    } else {
+        double tongDoanhThuThang = 0;
+
+    
+        for (const string& brand : listBrandUnique) {
+            fileOut << "----------------------------------------\n";
+            fileOut << "HANG: " << brand << "\n";
+            
+            double tongGiaHang = 0;
+            int tongSLHang = 0;
+            
+            
+            vector<string> listModelUnique;
+            for(const auto& hd : listLoc) {
+                if(hd.brand == brand) {
+                    bool exists = false;
+                    for(const string& m : listModelUnique) if(m == hd.model) exists = true;
+                    if(!exists) listModelUnique.push_back(hd.model);
+                }
+            }
+
+          
+            for(const string& model : listModelUnique) {
+                int slModel = 0;
+                double giaModel = 0; 
+                
+                for(const auto& hd : listLoc) {
+                    if(hd.brand == brand && hd.model == model) {
+                        slModel++;
+                        giaModel = hd.gia; 
+                    }
+                }
+                
+              
+                fileOut << "   + Xe: " << left << setw(15) << model 
+                        << " | SL: " << setw(3) << slModel 
+                        << " | Gia: " << fixed << setprecision(0) << giaModel << " Tr VND\n";
+                
+                tongSLHang += slModel;
+                tongGiaHang += (slModel * giaModel);
+            }
+
+            fileOut << "\n   -> Tong so xe cua hang: " << tongSLHang << " xe\n";
+            fileOut << "   -> Tong doanh thu hang: " << fixed << setprecision(0) << tongGiaHang << " Tr VND\n";
+            
+            tongDoanhThuThang += tongGiaHang;
+        }
+        
+        fileOut << "========================================\n";
+        fileOut << ">>> TONG DOANH THU CA THANG: " << fixed << setprecision(0) << tongDoanhThuThang << " Tr VND\n";
+        fileOut << "========================================\n\n";
+        
+        cout << ">> Da xuat BC1 (Chi tiet) vao file 'Baocao&Thongke.txt'.\n";
+    }
+    fileOut << "\n########################################################\n\n";
+    fileOut.close();
+}
+
+
+void bc2() {
+    int thang, nam;
+    cout << "\n--- [BC2] XE BAN CHAY / BAN E ---\n";
+    cout << "Nhap thang can thong ke (1-12): "; cin >> thang;
+    cout << "Nhap nam can thong ke: "; cin >> nam;
+    
+    ifstream fileIn("hoadon.txt");
+    if (!fileIn.is_open()) return;
+
+    map<string, int> demSoLuong;
+    string line;
+    int tongBan = 0;
+
+    while (getline(fileIn, line)) {
+        if (line.empty()) continue;
+        stringstream ss(line);
+        string segment;
+        vector<string> parts;
+        while(getline(ss, segment, '|')) parts.push_back(segment);
+
+        if (parts.size() >= 6) {
+            string ngay = parts[5];
+            if (ngay.length() >= 10) {
+                int t = stoi(ngay.substr(3, 2));
+                int n = stoi(ngay.substr(6, 4));
+                
+                if (t == thang && n == nam) {
+                    string carInfo = parts[3];
+                    string brand = carInfo.substr(0, carInfo.find('-'));
+                    demSoLuong[brand]++;
+                    tongBan++;
+                }
+            }
+        }
+    }
+    fileIn.close();
+
+    ofstream fileOut("Baocao&Thongke.txt", ios::app); 
+    if (fileOut.is_open()) {
+        fileOut << "=== [BC2] XEP HANG BAN CHAY / BAN E ===\n";
+        
+        if (tongBan == 0) {
+            fileOut << "Khong co du lieu de xep hang.\n";
+            cout << ">> Khong co du lieu ban hang trong thang nay.\n";
+        } else {
+            string hangBanChay = "", hangBanE = "";
+            int maxBan = INT_MIN;
+            int minBan = INT_MAX;
+
+            for (const auto& pair : demSoLuong) {
+                if (pair.second > maxBan) { maxBan = pair.second; hangBanChay = pair.first; }
+                if (pair.second < minBan) { minBan = pair.second; hangBanE = pair.first; }
+            }
+
+            fileOut << "[1] HANG XE BAN CHAY NHAT:\n";
+            fileOut << "    -> " << hangBanChay << ": " << maxBan << " xe\n\n";
+
+            fileOut << "[2] HANG XE BAN E NHAT:\n";
+            fileOut << "    -> " << hangBanE << ": " << minBan << " xe\n\n";
+
+            fileOut << "[3] TONG HOP SO LUONG:\n";
+            for (const auto& pair : demSoLuong) {
+                fileOut << "    - " << left << setw(15) << pair.first << ": " << pair.second << " xe\n";
+            }
+            cout << ">> Da xuat BC2 vao file 'Baocao&Thongke.txt'.\n";
+        }
+        fileOut << "\n########################################################\n\n";
+        fileOut.close();
+    }
+}
+void bc3() {
+    
+    Car listXe[MAX_CARS];
+    int soLuongXe = 0;
+    docFile(listXe, soLuongXe, "data_xe.txt");
+
+    if (soLuongXe == 0) {
+        cout << ">> Danh sách xe trống, không thể tạo báo cáo.\n";
+        return;
+    }
+
+    
+    ofstream fileOut("Baocao&Thongke.txt", ios::app);
+    if (!fileOut.is_open()) {
+        cout << ">> Loi: Khong mo duoc file bao cao!\n";
+        return;
+    }
+
+    fileOut << "\n=== [BC3] TINH TRANG KHO XE (CON HANG / DA BAN) ===\n";
+    
+    int conHang = 0;
+    int daBan = 0;
+
+   
+    fileOut << "\n--- I. DANH SACH XE CON HANG ---\n";
+    fileOut << string(95, '-') << endl;
+    fileOut << "| " << left << setw(5) << "ID" 
+            << "| " << setw(14) << "Hang xe" 
+            << "| " << setw(14) << "Model" 
+            << "| " << setw(12) << "N.Lieu"
+            << "| " << setw(10) << "Ma Luc"
+            << "| " << setw(14) << "Gia (VND)" 
+            << "| " << setw(12) << "Trang thai" << "|\n";
+    fileOut << string(95, '-') << endl;
+
+    for (int i = 0; i < soLuongXe; ++i) {
+        char status[50];
+        strcpy(status, listXe[i].status);
+        toUpperString(status); 
+        
+     
+        if (strstr(status, "DA BAN") == NULL) {
+            fileOut << "| " << left << setw(5) << listXe[i].id 
+                    << "| " << setw(14) << listXe[i].brand
+                    << "| " << setw(14) << listXe[i].model
+                    << "| " << setw(12) << listXe[i].fuel
+                    << "| " << setw(10) << listXe[i].horsepower
+                    << "| " << setw(14) << fixed << setprecision(0) << listXe[i].price
+                    << "| " << setw(12) << listXe[i].status << "|\n";
+            conHang++;
+        }
+    }
+    fileOut << string(95, '-') << "\n";
+
+    fileOut << "\n--- II. DANH SACH XE DA BAN ---\n";
+    fileOut << string(95, '-') << endl;
+    fileOut << "| " << left << setw(5) << "ID" 
+            << "| " << setw(14) << "Hang xe" 
+            << "| " << setw(14) << "Model" 
+            << "| " << setw(12) << "N.Lieu"
+            << "| " << setw(10) << "Ma Luc"
+            << "| " << setw(14) << "Gia (VND)" 
+            << "| " << setw(12) << "Trang thai" << "|\n";
+    fileOut << string(95, '-') << endl;
+
+    for (int i = 0; i < soLuongXe; ++i) {
+        char status[50];
+        strcpy(status, listXe[i].status);
+        toUpperString(status);
+        
+        if (strstr(status, "DA BAN") != NULL) {
+            fileOut << "| " << left << setw(5) << listXe[i].id 
+                    << "| " << setw(14) << listXe[i].brand
+                    << "| " << setw(14) << listXe[i].model
+                    << "| " << setw(12) << listXe[i].fuel
+                    << "| " << setw(10) << listXe[i].horsepower
+                    << "| " << setw(14) << fixed << setprecision(0) << listXe[i].price
+                    << "| " << setw(12) << listXe[i].status << "|\n";
+            daBan++;
+        }
+    }
+    fileOut << string(95, '-') << "\n";
+    fileOut << ">>> TONG KET:\n"; 
+    fileOut << "    So luong xe con trong kho: " << conHang << "\n"; 
+    fileOut << "    So luong xe da ban       : " << daBan << "\n";
+    fileOut << "    Tong so xe toan bo       : " << soLuongXe << "\n";
+    fileOut << "########################################################\n\n";
+
+    fileOut.close();
+    cout << "\n>> Da xuat bao cao BC3 (Ton kho) vao file 'Baocao&Thongke.txt'.\n";
+    cout << "   - Con hang: " << conHang << " xe\n";
+    cout << "   - Da ban  : " << daBan << " xe\n";
+}
+void ql5() {
+    int subChoice;
+    do {
+        xoaManHinh();
+        cout << "\n========================================\n";
+        cout << "       BAO CAO VA THONG KE\n";
+        cout << "========================================\n";
+        cout << "[1]. BC1: So luong va Doanh thu (Thang/Nam)\n";
+        cout << "[2]. BC2: Hang ban chay nhat & E nhat (Thang/Nam)\n";
+        cout << "[3]. BC3: Cac xe con hang va xe da ban\n";
+        cout << "[0]. Quay lai menu chinh\n";
+        cout << "Nhap lua chon: ";
+        
+        if (!(cin >> subChoice)) {
+            cin.clear(); cin.ignore(1000, '\n');
+            subChoice = -1;
+        }
+
+        switch (subChoice) {
+            case 1: 
+                bc1();
+                cout << "\nNhan Enter de tiep tuc..."; cin.ignore(); cin.get();
+                break;
+            case 2: 
+                bc2(); 
+                cout << "\nNhan Enter de tiep tuc..."; cin.ignore(); cin.get();
+                break;
+            case 3: 
+                bc3();
+                cout << "\nNhan Enter de tiep tuc..."; cin.ignore(); cin.get();
+                break;
+            case 0: return;
+            default: 
+                cout << "Lua chon khong hop le!\n"; 
+                cout << "\nNhan Enter de tiep tuc..."; cin.ignore(); cin.get();
+                break;
+        }
+    } while (subChoice != 0);
+}
 int main(){
     int choice;
     do{
         xoaManHinh();
-        cout << "\n-----CHÀO MỪNG BẠN ĐẾN VỚI CONSOLE QUẢN LÝ SHOWROOM Ô TÔ-----" << endl;
-        cout << "1. Quản lý Ô TÔ. " << endl;
-        cout << "2. Quản lý khách hàng. "<< endl;
-        cout << "3. Quản lý nhân viên. " << endl;
-        cout << "4, Tạo hoá đơn bán xe" << endl;
-        cout << "0. để thoát chương trình. " << endl;
-        cout << "nhập vào lựa chọn của bạn : " ;
+        cout << R"(
+   ___  __  __ _____ ____  
+  / _ \/ / / //_  _// __ \ 
+ / // / /_/ /  / / / /_/ / 
+/____/\____/  /_/  \____/  SHOWROOM MANAGER v2.0
+)" << endl;
+        cout << "-------------------------------" << endl;
+        cout << "[1]. Quản lý Ô TÔ. " << endl;
+        cout << "[2]. Quản lý khách hàng. "<< endl;
+        cout << "[3]. Quản lý nhân viên. " << endl;
+        cout << "[4]. Tạo hoá đơn bán xe" << endl;
+        cout << "[5]. Báo cáo và thống kê" << endl;
+        cout << "[0]. để thoát chương trình. " << endl;
+        cout << "-------------------------------" << endl;
+        cout << ">> nhập vào lựa chọn của bạn : " ;
         cin >> choice;
         switch(choice){
         case 1 :
@@ -1104,6 +1426,9 @@ int main(){
             break;
         case 4:
             ql4(); 
+            break;
+        case 5:
+            ql5();
             break;
         case 0 : 
             cout << "chương trình đang thoát nhấn enter để kết thúc. ";
