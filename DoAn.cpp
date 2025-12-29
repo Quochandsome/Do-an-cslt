@@ -12,6 +12,8 @@
 #include <climits>
 using namespace std;
 #define MAX_CARS 100
+#define CYAN    "\033[36m"      
+#define BOLD    "\033[1m"      
 void xoaManHinh() {
     #ifdef _WIN32
         system("cls");  
@@ -1398,7 +1400,7 @@ int main(){
     int choice;
     do{
         xoaManHinh();
-        cout << R"(
+        cout << BOLD << CYAN << R"(
    ___  __  __ _____ ____  
   / _ \/ / / //_  _// __ \ 
  / // / /_/ /  / / / /_/ / 
