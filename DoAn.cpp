@@ -672,7 +672,7 @@ void tim_nhan_vien() {
         cout << "\n>>> Không tìm thấy nhân viên nào với từ khóa: " << tuKhoa << ".\n";
     }
 }
-void ql3(){
+void quanlyNhanVien(){
     doc_file();
 
     int luaChon;
@@ -685,7 +685,7 @@ void ql3(){
         cout << "[3]. Sửa Thông Tin Nhân Viên\n";
         cout << "[4]. Xóa Nhân Viên\n";
         cout << "[5]. Tìm Kiếm Nhân Viên\n";
-        cout << "[0]. quay lại cosole \n";
+        cout << "[0]. quay lại console \n";
         cout << "------------------------------------\n";
         cout << "Nhập lựa chọn của bạn: ";
         
@@ -1360,7 +1360,7 @@ void bc3() {
     cout << "   - Còn hàng: " << conHang << " xe\n";
     cout << "   - Đã bán  : " << daBan << " xe\n";
 }
-void ql5() {
+void quanlyBaoCaoVaThongKe() {
     int subChoice;
     do {
         xoaManHinh();
@@ -1419,31 +1419,31 @@ int main(){
         cout << "-------------------------------" << endl;
         cout << ">> nhập vào lựa chọn của bạn : " ;
         cin >> choice;
-        switch(choice){
-        case 1 :
-            quanlyXe();
-            break;
-        case 2:
-            quanlyKhachHang();
-            break;
-        case 3:
-            ql3();
-            break;
-        case 4:
-            quanlyHoaDon(); 
-            break;
-        case 5:
-            ql5();
-            break;
-        case 0 : 
-            cout << "chương trình đang thoát nhấn enter để kết thúc. ";
-            cin.ignore();
-            cin.get();
-            break;
-        default :
-            cout << "lựa chọn của bạn không hợp lệ vui lòng chọn lại nhé!! " ;
-            break;
-    }
-    }while( choice != 0 );
+        switch(choice) {
+            case 1:
+                quanlyXe();
+                break;
+            case 2:
+                quanlyKhachHang();
+                break;
+            case 3:
+                quanlyNhanVien();
+                break;
+            case 4:
+                quanlyHoaDon(); 
+                break;
+            case 5:
+                quanlyBaoCaoVaThongKe();
+                break;
+            case 0: 
+                cout << "chương trình đang thoát nhấn Enter để kết thúc. ";
+                cin.ignore();
+                cin.get();
+                break;
+            default:
+                cout << "lựa chọn của bạn không hợp lệ vui lòng chọn lại nhé!! " ;
+                break;
+        }
+    } while( choice != 0 );
     return 0;
 }
